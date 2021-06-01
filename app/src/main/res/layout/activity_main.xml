@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:id="@+id/layoutTop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FF6200EE"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/appTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="5dp"
+            android:text="Wallpaper HD"
+            android:textColor="@color/white"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+
+        <LinearLayout
+            android:id="@+id/layoutTypeSend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="2dp"
+            android:orientation="horizontal">
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:elevation="5dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="30dp">
+
+                <EditText
+                    android:id="@+id/searchBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginLeft="10dp"
+                    android:background="@null"
+                    android:hint="Search Wallpaper..."
+                    android:padding="5dp"
+                    android:textColor="@color/black"
+                    android:textColorHint="#92B5F1"
+                    android:textSize="14dp" />
+
+
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/searchIcon"
+                android:layout_width="50dp"
+                android:layout_height="35dp"
+                android:layout_gravity="center_vertical"
+                android:layout_margin="5dp"
+                android:elevation="5dp"
+                android:background="#ffffff"
+                app:cardCornerRadius="50dp">
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+
+                    android:background="@drawable/ic_search" />
+
+
+            </androidx.cardview.widget.CardView>
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+          android:layout_above="@id/adView"
+        android:layout_marginBottom="2dp"
+        android:layout_below="@id/layoutTop" />
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        ads:adSize="BANNER"
+        android:layout_margin="5dp"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+    </com.google.android.gms.ads.AdView>
+
+
+</RelativeLayout>
