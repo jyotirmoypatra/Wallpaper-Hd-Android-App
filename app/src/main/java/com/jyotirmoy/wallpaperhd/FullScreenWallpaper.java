@@ -67,6 +67,7 @@ public class FullScreenWallpaper extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     String selectWallpaper = "Set Home Screen";
     ProgressDialog dialog;
+    ProgressDialog p;
     private InterstitialAd mInterstitialAd;
 
 
@@ -82,10 +83,12 @@ public class FullScreenWallpaper extends AppCompatActivity {
 
 
         dialog = new ProgressDialog(FullScreenWallpaper.this);
-
         dialog.setMessage("Loading HD Image...");
         dialog.setCancelable(false);
         dialog.show();
+
+
+
 
 
         Intent intent = getIntent();
@@ -153,7 +156,14 @@ public class FullScreenWallpaper extends AppCompatActivity {
                 return true;
             }
 
+
+
             private void showSetWallpaperOptions() {
+
+                p=new ProgressDialog(FullScreenWallpaper.this);
+                p.setMessage("setting Wallpaper..");
+                dialog.setCancelable(false);
+
                 final String[] wallpaperOption = {"Set Home Screen", "Set Lock Screen", "Set Both"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(FullScreenWallpaper.this);
                 builder.setTitle("Choose Options");
@@ -168,40 +178,51 @@ public class FullScreenWallpaper extends AppCompatActivity {
                     @RequiresApi(api = Build.VERSION_CODES.N)
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
+                        p.show();
                         if (selectWallpaper == wallpaperOption[0]) {
+
                             WallpaperManager wallpaperManager = WallpaperManager.getInstance(FullScreenWallpaper.this);
                             Bitmap bitmap = ((BitmapDrawable) photoView.getDrawable()).getBitmap();
                             try {
+
 
                                 final int i = wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM);
                                 Toast.makeText(FullScreenWallpaper.this, "Set Home Wallpaper Successfully", Toast.LENGTH_SHORT).show();
 
                             } catch (IOException e) {
                                 e.printStackTrace();
+
                             }
+
                         }
                         if (selectWallpaper == wallpaperOption[1]) {
                             WallpaperManager wallpaperManager = WallpaperManager.getInstance(FullScreenWallpaper.this);
                             Bitmap bitmap = ((BitmapDrawable) photoView.getDrawable()).getBitmap();
                             try {
+
                                 final int i = wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
                                 Toast.makeText(FullScreenWallpaper.this, "Set Lock Wallpaper Successfully", Toast.LENGTH_SHORT).show();
 
                             } catch (IOException e) {
                                 e.printStackTrace();
+
                             }
+
                         }
                         if (selectWallpaper == wallpaperOption[2]) {
                             WallpaperManager wallpaperManager = WallpaperManager.getInstance(FullScreenWallpaper.this);
                             Bitmap bitmap = ((BitmapDrawable) photoView.getDrawable()).getBitmap();
                             try {
+
                                 wallpaperManager.setBitmap(bitmap);
                                 Toast.makeText(FullScreenWallpaper.this, "Set Wallpaper Successfully", Toast.LENGTH_SHORT).show();
 
                             } catch (IOException e) {
                                 e.printStackTrace();
+
                             }
                         }
+                        p.dismiss();
                         dialog.dismiss();
                     }
                 });

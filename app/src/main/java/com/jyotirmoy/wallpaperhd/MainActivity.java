@@ -8,12 +8,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,12 +51,13 @@ public class MainActivity extends AppCompatActivity {
     ProgressDialog dialog;
     Boolean isScroll = false;
     int currentItem, totalItem, scrollOutItems;
-    String url="https://api.pexels.com/v1/curated/?page=" + pageNumber + "&per_page=80";
-    Boolean search=false;
+    String url = "https://api.pexels.com/v1/curated/?page=" + pageNumber + "&per_page=80";
+    Boolean search = false;
     CardView searchIcon;
     TextView appName;
     EditText searchText;
     private AdView mAdView;
+    ImageView iBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
             public void onAdLoaded() {
                 // Code to be executed when an ad finishes loading.
                 super.onAdLoaded();
-                Toast.makeText(MainActivity.this,"Ad loader",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Ad loader", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -92,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 // Code to be executed when an ad opens an overlay that
                 // covers the screen.
                 super.onAdOpened();
-                Toast.makeText(MainActivity.this,"Ad open",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Ad open", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -100,25 +103,23 @@ public class MainActivity extends AppCompatActivity {
                 // Code to be executed when the user clicks on an ad.
                 super.onAdClicked();
 
-                Toast.makeText(MainActivity.this,"Ad click",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Ad click", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onAdClosed() {
                 // Code to be executed when the user is about to return
                 // to the app after tapping on an ad.
-super.onAdClosed();
-                Toast.makeText(MainActivity.this,"Ad closed",Toast.LENGTH_SHORT).show();
+                super.onAdClosed();
+                Toast.makeText(MainActivity.this, "Ad closed", Toast.LENGTH_SHORT).show();
             }
         });
-
-
-
 
 
         dialog = new ProgressDialog(MainActivity.this);
         dialog.setMessage("Loading...");
         dialog.setCancelable(false);
+
 
 
         recyclerView = findViewById(R.id.recyclerView);
@@ -131,10 +132,17 @@ super.onAdClosed();
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(gridLayoutManager);
 
+      iBtn=findViewById(R.id.infoBtn);
+      iBtn.setOnClickListener(new View.OnClickListener() {
+          @Override
+          public void onClick(View v) {
+              startActivity(new Intent(MainActivity.this,appInfo.class));
+          }
+      });
 
 
 
-        if(!search){
+        if (!search) {
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override
                 public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
@@ -156,7 +164,7 @@ super.onAdClosed();
                     if (isScroll && (currentItem + scrollOutItems == totalItem)) {
                         isScroll = false;
                         dialog.show();
-                        url="https://api.pexels.com/v1/curated/?page=" + pageNumber + "&per_page=80";
+                        url = "https://api.pexels.com/v1/curated/?page=" + pageNumber + "&per_page=80";
                         fetchWallpaper();
                     }
                 }
@@ -167,24 +175,24 @@ super.onAdClosed();
         fetchWallpaper();
 
 
-        searchIcon=findViewById(R.id.searchIcon);
-        searchText=findViewById(R.id.searchBox);
+        searchIcon = findViewById(R.id.searchIcon);
+        searchText = findViewById(R.id.searchBox);
 
         searchIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                search=true;
-               String searchQuery=searchText.getText().toString().toLowerCase();
+                search = true;
+                String searchQuery = searchText.getText().toString().toLowerCase();
 
                 searchString(searchQuery);
                 closeKeyboard();
 
-                if(searchQuery.isEmpty()){
-                    Toast.makeText(MainActivity.this,"Enter your search query!!",Toast.LENGTH_SHORT).show();
-                }else {
-                    pageNumber=1;
+                if (searchQuery.isEmpty()) {
+                    Toast.makeText(MainActivity.this, "Enter your search query!!", Toast.LENGTH_SHORT).show();
+                } else {
+                    pageNumber = 1;
 
-                    url="https://api.pexels.com/v1/search/?page="+pageNumber+"&per_page=80&query="+searchQuery;
+                    url = "https://api.pexels.com/v1/search/?page=" + pageNumber + "&per_page=80&query=" + searchQuery;
                     wallpaperModelList.clear();
                     dialog.show();
                     fetchWallpaper();
@@ -216,7 +224,7 @@ super.onAdClosed();
                             isScroll = false;
                             dialog.show();
 
-                            url="https://api.pexels.com/v1/search/?page="+pageNumber+"&per_page=80&query="+searchQuery;
+                            url = "https://api.pexels.com/v1/search/?page=" + pageNumber + "&per_page=80&query=" + searchQuery;
                             fetchWallpaper();
                         }
                     }
@@ -225,15 +233,15 @@ super.onAdClosed();
         });
 
 
-        appName=findViewById(R.id.appTitle);
+        appName = findViewById(R.id.appTitle);
         appName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 searchText.setText("");
                 wallpaperModelList.clear();
                 dialog.show();
-                pageNumber=1;
-                url="https://api.pexels.com/v1/curated/?page=" + pageNumber + "&per_page=80";
+                pageNumber = 1;
+                url = "https://api.pexels.com/v1/curated/?page=" + pageNumber + "&per_page=80";
                 fetchWallpaper();
             }
         });
@@ -242,17 +250,17 @@ super.onAdClosed();
     }
 
     private void closeKeyboard() {
-        View view=this.getCurrentFocus();
-        if(view!=null){
-            InputMethodManager imm=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(),0);
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
 
     public void fetchWallpaper() {
 
-        StringRequest request = new StringRequest(Request.Method.GET,url, new Response.Listener<String>() {
+        StringRequest request = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
 
@@ -277,7 +285,7 @@ super.onAdClosed();
 
                     }
                     adapterWallpaper.notifyDataSetChanged();
-                    pageNumber=pageNumber+1;
+                    pageNumber = pageNumber + 1;
 
 
                 } catch (JSONException e) {
