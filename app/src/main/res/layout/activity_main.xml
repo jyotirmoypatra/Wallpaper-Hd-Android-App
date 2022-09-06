@@ -75,7 +75,9 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"
+                    android:imeOptions="actionSearch"
                     android:background="@null"
+                    android:inputType="text"
                     android:hint="Search Wallpaper..."
                     android:padding="5dp"
                     android:textColor="@color/black"
@@ -91,13 +93,13 @@
                 android:layout_height="35dp"
                 android:layout_gravity="center_vertical"
                 android:layout_margin="5dp"
-                android:background="#ffffff"
+               android:backgroundTint="@color/white"
                 android:elevation="5dp"
                 app:cardCornerRadius="50dp">
 
                 <ImageView
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_gravity="center"
 
                     android:background="@drawable/ic_search" />

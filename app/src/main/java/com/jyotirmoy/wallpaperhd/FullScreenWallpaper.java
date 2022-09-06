@@ -25,6 +25,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.KeyEvent;
@@ -52,6 +53,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -89,8 +92,6 @@ public class FullScreenWallpaper extends AppCompatActivity {
 
 
 
-
-
         Intent intent = getIntent();
         originalUrl = intent.getStringExtra("originalUrl");
 
@@ -122,15 +123,21 @@ public class FullScreenWallpaper extends AppCompatActivity {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
 
-                DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
-                Uri uri = Uri.parse(originalUrl);
-                DownloadManager.Request request = new DownloadManager.Request(uri);
                 try{
-                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                    downloadManager.enqueue(request);
-                    Toast.makeText(FullScreenWallpaper.this, "Download Started", Toast.LENGTH_SHORT).show();
+                    DownloadManager dm = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                    Uri downloadUri = Uri.parse(originalUrl);
+                    DownloadManager.Request request = new DownloadManager.Request(downloadUri);
+                    String filename = String.format("%d",System.currentTimeMillis());
+                    request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_WIFI | DownloadManager.Request.NETWORK_MOBILE)
+                            .setAllowedOverRoaming(false)
+                            .setTitle(filename)
+                            .setMimeType("image/jpeg") // Your file type. You can use this code to download other file types also.
+                            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                            .setDestinationInExternalPublicDir(Environment.DIRECTORY_PICTURES,File.separator + filename + ".jpg");
+                    dm.enqueue(request);
+                    Toast.makeText(getApplicationContext(), "Image download started.", Toast.LENGTH_SHORT).show();
                 }catch (Exception e){
-                    Toast.makeText(FullScreenWallpaper.this, "Download Failed!!!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Image download failed.", Toast.LENGTH_SHORT).show();
                 }
 
                 return true;
@@ -162,7 +169,7 @@ public class FullScreenWallpaper extends AppCompatActivity {
 
                 p=new ProgressDialog(FullScreenWallpaper.this);
                 p.setMessage("setting Wallpaper..");
-                dialog.setCancelable(false);
+                p.setCancelable(false);
 
                 final String[] wallpaperOption = {"Set Home Screen", "Set Lock Screen", "Set Both"};
                 AlertDialog.Builder builder = new AlertDialog.Builder(FullScreenWallpaper.this);
@@ -178,19 +185,21 @@ public class FullScreenWallpaper extends AppCompatActivity {
                     @RequiresApi(api = Build.VERSION_CODES.N)
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        p.show();
+
                         if (selectWallpaper == wallpaperOption[0]) {
 
                             WallpaperManager wallpaperManager = WallpaperManager.getInstance(FullScreenWallpaper.this);
                             Bitmap bitmap = ((BitmapDrawable) photoView.getDrawable()).getBitmap();
                             try {
 
-
+                                p.show();
                                 final int i = wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_SYSTEM);
+                                p.dismiss();
                                 Toast.makeText(FullScreenWallpaper.this, "Set Home Wallpaper Successfully", Toast.LENGTH_SHORT).show();
 
                             } catch (IOException e) {
                                 e.printStackTrace();
+                                p.dismiss();
 
                             }
 
@@ -199,8 +208,10 @@ public class FullScreenWallpaper extends AppCompatActivity {
                             WallpaperManager wallpaperManager = WallpaperManager.getInstance(FullScreenWallpaper.this);
                             Bitmap bitmap = ((BitmapDrawable) photoView.getDrawable()).getBitmap();
                             try {
+                                p.show();
 
                                 final int i = wallpaperManager.setBitmap(bitmap, null, true, WallpaperManager.FLAG_LOCK);
+                                p.dismiss();
                                 Toast.makeText(FullScreenWallpaper.this, "Set Lock Wallpaper Successfully", Toast.LENGTH_SHORT).show();
 
                             } catch (IOException e) {
@@ -238,6 +249,8 @@ public class FullScreenWallpaper extends AppCompatActivity {
 
 
     }
+
+
 
     private void loadInterstitialAd() {
         AdRequest adRequest = new AdRequest.Builder().build();

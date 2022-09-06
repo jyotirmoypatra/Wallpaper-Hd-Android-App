@@ -3,13 +3,18 @@ package com.jyotirmoy.wallpaperhd;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
@@ -59,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     private AdView mAdView;
     ImageView iBtn;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +86,7 @@ public class MainActivity extends AppCompatActivity {
             public void onAdLoaded() {
                 // Code to be executed when an ad finishes loading.
                 super.onAdLoaded();
-                Toast.makeText(MainActivity.this, "Ad loader", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(MainActivity.this, "Ad loader", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -95,7 +101,7 @@ public class MainActivity extends AppCompatActivity {
                 // Code to be executed when an ad opens an overlay that
                 // covers the screen.
                 super.onAdOpened();
-                Toast.makeText(MainActivity.this, "Ad open", Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(MainActivity.this, "Ad open", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -103,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 // Code to be executed when the user clicks on an ad.
                 super.onAdClicked();
 
-                Toast.makeText(MainActivity.this, "Ad click", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(MainActivity.this, "Ad click", Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -111,7 +117,7 @@ public class MainActivity extends AppCompatActivity {
                 // Code to be executed when the user is about to return
                 // to the app after tapping on an ad.
                 super.onAdClosed();
-                Toast.makeText(MainActivity.this, "Ad closed", Toast.LENGTH_SHORT).show();
+                //  Toast.makeText(MainActivity.this, "Ad closed", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -119,7 +125,6 @@ public class MainActivity extends AppCompatActivity {
         dialog = new ProgressDialog(MainActivity.this);
         dialog.setMessage("Loading...");
         dialog.setCancelable(false);
-
 
 
         recyclerView = findViewById(R.id.recyclerView);
@@ -132,14 +137,13 @@ public class MainActivity extends AppCompatActivity {
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
         recyclerView.setLayoutManager(gridLayoutManager);
 
-      iBtn=findViewById(R.id.infoBtn);
-      iBtn.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View v) {
-              startActivity(new Intent(MainActivity.this,appInfo.class));
-          }
-      });
-
+        iBtn = findViewById(R.id.infoBtn);
+        iBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this, appInfo.class));
+            }
+        });
 
 
         if (!search) {
@@ -177,59 +181,26 @@ public class MainActivity extends AppCompatActivity {
 
         searchIcon = findViewById(R.id.searchIcon);
         searchText = findViewById(R.id.searchBox);
+        searchText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH) {
+                    performSearch();
+                    return true;
+                }
+                return false;
+            }
+        });
 
         searchIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                search = true;
-                String searchQuery = searchText.getText().toString().toLowerCase();
+                performSearch();
 
-                searchString(searchQuery);
-                closeKeyboard();
-
-                if (searchQuery.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "Enter your search query!!", Toast.LENGTH_SHORT).show();
-                } else {
-                    pageNumber = 1;
-
-                    url = "https://api.pexels.com/v1/search/?page=" + pageNumber + "&per_page=80&query=" + searchQuery;
-                    wallpaperModelList.clear();
-                    dialog.show();
-                    fetchWallpaper();
-                }
 
             }
 
-            private void searchString(String searchQuery) {
 
-                recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-                    @Override
-                    public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                        super.onScrollStateChanged(recyclerView, newState);
-
-                        if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
-                            isScroll = true;
-                        }
-                    }
-
-                    @Override
-                    public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                        super.onScrolled(recyclerView, dx, dy);
-
-                        currentItem = gridLayoutManager.getChildCount();
-                        totalItem = gridLayoutManager.getItemCount();
-                        scrollOutItems = gridLayoutManager.findFirstVisibleItemPosition();
-
-                        if (isScroll && (currentItem + scrollOutItems == totalItem)) {
-                            isScroll = false;
-                            dialog.show();
-
-                            url = "https://api.pexels.com/v1/search/?page=" + pageNumber + "&per_page=80&query=" + searchQuery;
-                            fetchWallpaper();
-                        }
-                    }
-                });
-            }
         });
 
 
@@ -247,6 +218,57 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    private void performSearch() {
+        search = true;
+        String searchQuery = searchText.getText().toString().toLowerCase();
+
+        searchString(searchQuery);
+        closeKeyboard();
+
+        if (searchQuery.isEmpty()) {
+            Toast.makeText(MainActivity.this, "Enter your search query!!", Toast.LENGTH_SHORT).show();
+        } else {
+            pageNumber = 1;
+
+            url = "https://api.pexels.com/v1/search/?page=" + pageNumber + "&per_page=80&query=" + searchQuery;
+            wallpaperModelList.clear();
+            dialog.show();
+            fetchWallpaper();
+        }
+    }
+    private void searchString(String searchQuery) {
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2);
+        recyclerView.setLayoutManager(gridLayoutManager);
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL) {
+                    isScroll = true;
+                }
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                currentItem = gridLayoutManager.getChildCount();
+                totalItem = gridLayoutManager.getItemCount();
+                scrollOutItems = gridLayoutManager.findFirstVisibleItemPosition();
+
+                if (isScroll && (currentItem + scrollOutItems == totalItem)) {
+                    isScroll = false;
+                    dialog.show();
+
+                    url = "https://api.pexels.com/v1/search/?page=" + pageNumber + "&per_page=80&query=" + searchQuery;
+                    fetchWallpaper();
+                }
+            }
+        });
     }
 
     private void closeKeyboard() {

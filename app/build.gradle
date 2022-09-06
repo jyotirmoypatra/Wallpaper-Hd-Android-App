@@ -42,4 +42,5 @@ dependencies {
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
     implementation 'com.android.volley:volley:1.2.0'
     implementation 'com.google.android.gms:play-services-ads:20.1.0'
+
 }

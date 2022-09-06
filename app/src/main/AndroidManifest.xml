@@ -15,7 +15,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.WallpaperHD">
-        <activity android:name=".appInfo"></activity>
+        <activity
+            android:name=".privacy_policy"
+            android:exported="false" />
+        <activity android:name=".appInfo" />
         <activity
             android:name=".splashActivity"
             android:screenOrientation="portrait">
